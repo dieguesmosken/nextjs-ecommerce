@@ -24,16 +24,33 @@
 
         function handleCredentialResponse(response) {
             const data = jwtDecode(response.credential);
-            document.getElementById("profile-pic").src = data.picture;
-            document.getElementById("profile-pic").style.display = "block";
-            document.getElementById("name").innerText = `Nome: ${data.name}`;
-            document.getElementById("email").innerText = `Email: ${data.email}`;
 
-            document.getElementById("signin-button").style.display = "none";
-            document.getElementById("signout-button").style.display = "block";
+            // Salvar os dados no localStorage
+            localStorage.setItem("user", JSON.stringify({
+                name: data.name,
+                email: data.email,
+                picture: data.picture
+            }));
+
+            // Exibir os dados
+            showUserInfo();
+        }
+
+        function showUserInfo() {
+            const userData = JSON.parse(localStorage.getItem("user"));
+
+            if (userData) {
+                document.getElementById("profile-pic").src = userData.picture;
+                document.getElementById("profile-pic").style.display = "block";
+                document.getElementById("name").innerText = `Nome: ${userData.name}`;
+                document.getElementById("email").innerText = `Email: ${userData.email}`;
+                document.getElementById("signin-button").style.display = "none";
+                document.getElementById("signout-button").style.display = "block";
+            }
         }
 
         function signOut() {
+            localStorage.removeItem("user"); // Remove os dados do usuário
             document.getElementById("profile-pic").style.display = "none";
             document.getElementById("name").innerText = "";
             document.getElementById("email").innerText = "";
@@ -52,7 +69,10 @@
                 { theme: "outline", size: "large" }
             );
 
-            google.accounts.id.prompt();
+            google.accounts.id.prompt(); // Exibe o prompt para login
+
+            // Se o usuário já está logado, mostrar os dados salvos
+            showUserInfo();
         };
     </script>
 
